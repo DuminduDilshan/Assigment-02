@@ -10,18 +10,30 @@ edges = cv.Canny(img, 550, 690)
 indices = np.where(edges != 0)
 x, y = indices[1], indices[0]
 
-A = np.vstack([x, np.ones(len(x))]).T
-m, b = np.linalg.lstsq(A, y, rcond=None)[0]
+# Calculate the least-squares-fit
+m, b = np.polyfit(x, y, 1)
 
-x_line = np.array([x.min(), x.max()])
-y_line = m * x_line + b
+# Create the line for plotting
+x_fit = np.array([np.min(x), np.max(x)])
+y_fit = m * x_fit + b
 
-plt.figure(figsize=(10, 7))
-plt.scatter(x, y, s=5, alpha=0.3)
-plt.plot(x_line, y_line, 'r-', linewidth=3)
-plt.gca().invert_yaxis()
-plt.title('Q3: Least-Squares-Fit Line')
+# Graphical Representation
+plt.figure(figsize=(6, 6))
+
+# Plot the original edge points as a scatter plot
+plt.scatter(x, y, s=1, c='blue', marker='.', label='Edge Points (Data)')
+
+# Plot the least-squares-fit line
+plt.plot(x_fit, y_fit, color='red', linewidth=2, label=f'LS Fit: y={m:.2f}x+{b:.2f}')
+
+# Adjust plot settings
+plt.gca().invert_yaxis()  # Match image coordinate system
+plt.title('Least-Squares-Fit Line on Extracted Edges')
 plt.xlabel('x')
 plt.ylabel('y')
-plt.tight_layout()
+plt.legend()
+plt.grid(True, linestyle='--', alpha=0.5)
 plt.show()
+
+print(f"Estimated Slope (m): {m}")
+print(f"Estimated Intercept (b): {b}")
