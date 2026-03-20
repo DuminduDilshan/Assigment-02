@@ -1,0 +1,56 @@
+# ANSWERS TO ANALYSIS QUESTIONS
+
+## Q5: Is the Least-Squares estimation correct? If not, explain reason for this error.
+
+**Answer:**
+The least-squares-fit method MV NOT be entirely correct because:
+1. **Noise and Outliers**: The Canny edge detector may produce noisy or broken edges that don't perfectly 
+   represent the actual crop rows. Least-squares fitting treats all pixels equally and is sensitive to outliers.
+2. **Both-direction errors**: Least-squares only minimizes vertical (y-direction) errors. It doesn't account 
+   for errors in both x and y directions.
+3. **Edge Detection Artifacts**: The detected edges may include noise from soil texture, shadows, and 
+   vegetation that don't align with the actual crop rows.
+
+
+## Q8: Is the Total-Least-Squares estimation correct? If not, explain reason for this error.
+
+**Answer:**
+The total-least-squares-fit (PCA/SVD) method is BETTER than ordinary least-squares because:
+1. **Balanced Error Minimization**: It minimizes errors in both x and y directions, not just y.
+2. **Better for noise**: It's more robust to random noise in the data.
+3. **Geometric fit**: It finds the best geometric fit rather than regression fit.
+
+However, it may still have issues with:
+- Extreme outliers from edge detection artifacts
+- Broken or fragmented edges that don't represent true crop rows
+- The method still gives equal weight to all detected points
+
+
+## Q12: Why is RANSAC better than Least-Squares and Total-Least-Squares?
+
+**Answer:**
+RANSAC (Random Sample Consensus) is superior for this agriculture crop slope estimation because:
+
+1. **Outlier Rejection**: RANSAC automatically identifies and excludes outliers (noisy edge pixels) 
+   while fitting to the main trend of the crop rows.
+
+2. **Robustness**: It's the most robust method against:
+   - Edge detection noise and artifacts
+   - Broken or discontinuous edges from shadows and vegetation occlusion
+   - Multiple competing edges that don't represent the true crop direction
+
+3. **Real-world applicability**: Crop fields are rarely perfectly straight lines with uniform edges. 
+   RANSAC focuses on the dominant linear pattern (the main crop rows) rather than all detected edges.
+
+4. **Better angle estimation**: By filtering out noise, RANSAC provides a more accurate estimate 
+   of the true crop row angle, which is important for autonomous farming applications.
+
+5. **Consensus-based**: RANSAC uses a consensus model - fitting to the largest set of consistent 
+   points, which aligns well with how humans would estimate the crop row direction (looking at 
+   the main trend, not every edge pixel).
+
+**Why not the other methods?**
+- Least-squares: Too sensitive to all pixels, no outlier handling
+- Total-least-squares: Better than LS but still treats all points equally without discrimination
+
+For agricultural applications, RANSAC is clearly the best choice.
